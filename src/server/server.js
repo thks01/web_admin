@@ -5,14 +5,10 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mysql = require("mysql"); // mysql 모듈 사용
 
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root", //mysql의 id
-  password: "gmlwls1014@!", //mysql의 password
-  database: "bitcoin", //사용할 데이터베이스
-});
+const connection = require("./config/db");
+const { connect } = require("./routes/user_inform");
 
-connection.connect();
+//connection.connect();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -20,8 +16,37 @@ app.use(cors());
 // app.use("/", require("./router"));
 // app.use("/login", require("./router"));
 
-app.get("/", (req, res) => {
-  res.send("<h1>서버입니다</h1>");
+app.get("/userinfo", (req, res) => {
+  const sql = "SELECT * FROM users";
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.get("/groupinfo", (req, res) => {
+  const sql = "SELECT * FROM groups";
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.get("/predictioninfo", (req, res) => {
+  const sql = "SELECT * FROM prediction";
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(results);
+    }
+  });
 });
 
 app.get("/register", (req, res) => {
@@ -33,25 +58,49 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const age = req.body.age;
-  const gender = req.body.gender;
-  const eduBackground = req.body.eduBackground;
-  const degree = req.body.degree;
-  const email = req.body.email;
-  const password = req.body.password;
-  console.log(req.body);
-  connection.query(
-    "INSERT INTO infos (age, gender, eduBackground, degree, email, password) VALUES (?, ?, ?, ?, ?, ?)",
-    [age, gender, eduBackground, degree, email, password],
-    function (err, rows, fields) {
-      if (err) {
-        console.log(err);
-        console.log("실패");
-      } else {
-        console.log("성공");
-      }
+  const body = req.body;
+  connection.query("SELECT COUNT(*) FROM users", (err, result) => {
+    if (result) {
+      const id = result[0]["COUNT(*)"] + 1;
+      const groupNum = parseInt(result[0]["COUNT(*)"] / 4) + 1;
+
+      connection.query(
+        "INSERT INTO users (id, age, gender, eduBackground, degree, email, password, group_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          id,
+          body.age,
+          body.gender,
+          body.eduBackground,
+          body.degree,
+          body.email,
+          body.password,
+          groupNum,
+        ],
+        (err, result) => {
+          if (result) {
+            connection.query(
+              "INSERT INTO prediction (user_id, group_id) VALUES (?, ?)",
+              [id, groupNum]
+            );
+
+            connection.query(
+              "SELECT group_size FROM bitcoin.groups WHERE group_id = ?",
+              [groupNum],
+              (err, result) => {
+                if (result) {
+                  let group_size = result[0]["group_size"] + 1;
+                  connection.query(
+                    "UPDATE bitcoin.groups SET group_size = ? WHERE group_id = ?",
+                    [group_size, groupNum]
+                  );
+                }
+              }
+            );
+          }
+        }
+      );
     }
-  );
+  });
 });
 
 app.post("/login", (req, res) => {
@@ -59,17 +108,17 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
 
   connection.query(
-    "SELECT * FROM infos WHERE email=? AND password=?",
+    "SELECT u.email, g.group_type FROM bitcoin.users AS u JOIN bitcoin.groups AS g ON u.group_num = g.group_id WHERE u.email=? AND u.password=?",
     [email, password],
     (err, result) => {
       if (err) {
         res.send({ err: err });
       }
-
+      console.log(result);
       if (result.length > 0) {
         res.send(result);
       } else {
-        res.send({ message: "Wrong email / password combination" });
+        res.status(404).send({ message: "실패" });
       }
     }
   );

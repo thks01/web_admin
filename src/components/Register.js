@@ -16,11 +16,15 @@ function Register() {
   const [Gender, setGender] = useState("male");
   const [EduBackground, setEduBackground] = useState("");
   const [Degree, setDegree] = useState("");
+  const [isChecked, setIschecked] = useState(false);
+  const [isRedundancy, setisRedundancy] = useState(false);
+
   const navigate = useNavigate();
 
   // handler 함수들
   const onEmailHandler = (event) => {
     setEmail(event.currentTarget.value);
+    setIschecked(false);
   };
 
   const onNameHandler = (event) => {
@@ -51,12 +55,46 @@ function Register() {
     setDegree(event.currentTarget.value);
   };
 
+  const onEmailRedundancyCheck = (event) => {
+    event.preventDefault();
+    fetch("http://172.30.1.17:4000/userinfo")
+      .then((response) => response.json())
+      .then((res) => {
+        for (let i = 0; i < res.length; i++) {
+          if (res[i]["email"] === Email) {
+            setisRedundancy(true);
+            return alert("이미 사용 중인 이메일입니다!");
+          } else {
+            setisRedundancy(false);
+          }
+        }
+        if (!isRedundancy) alert("사용 가능한 이메일입니다!");
+        setIschecked(true);
+      });
+  };
+
   const onSubmitHandler = (event) => {
     // 태그의 기본 기능으로 리프레쉬 되는 것을 방지.
     event.preventDefault();
 
-    if (Password !== ConfirmPassword) {
+    if (Email === "") {
+      return alert("이메일을 입력해주세요.");
+    } else if (!isChecked) {
+      return alert("이메일 중복 체크를 해주세요.");
+    } else if (isRedundancy) {
+      return alert("다른 이메일을 사용해주세요.");
+    } else if (Name === "") {
+      return alert("이름을 입력해주세요.");
+    } else if (Password === "") {
+      return alert("비밀번호를 입력해주세요.");
+    } else if (Password !== ConfirmPassword) {
       return alert("비밀번호 확인이 일치하지 않습니다.");
+    } else if (Age === "") {
+      return alert("나이를 입력해주세요.");
+    } else if (EduBackground === "") {
+      return alert("교육 배경을 입력해주세요.");
+    } else if (Degree === "") {
+      return alert("최종 학력을 입력해주세요.");
     }
 
     let body = {
@@ -69,25 +107,25 @@ function Register() {
       degree: Degree,
     };
 
-    fetch("http://localhost:3001/register", {
+    fetch("http://172.30.1.17:4000/register", {
       method: "post", // 통신방법
       headers: {
         "content-type": "application/json",
       },
       body: JSON.stringify(body),
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        setEmail(body.email);
-        setName(body.name);
-        setPassword(body.password);
-        setAge(body.age);
-        setGender(body.gender);
-        setEduBackground(body.eduBackground);
-        setDegree(body.degree);
-      });
+    }).then((res) => {
+      setEmail(body.email);
+      setName(body.name);
+      setPassword(body.password);
+      setAge(body.age);
+      setGender(body.gender);
+      setEduBackground(body.eduBackground);
+      setDegree(body.degree);
+    });
 
     console.log(body);
+
+    alert("회원 가입이 완료되었습니다.");
 
     navigate("/");
   };
@@ -99,6 +137,9 @@ function Register() {
     >
       <label>이메일</label>
       <input type="email" value={Email} onChange={onEmailHandler} />
+      <button type="submit" onClick={onEmailRedundancyCheck}>
+        이메일 중복 체크
+      </button>
       <label>이름</label>
       <input type="text" value={Name} onChange={onNameHandler} />
       <label>비밀번호</label>

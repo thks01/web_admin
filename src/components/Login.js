@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const [inputId, setInputId] = useState("");
   const [inputPw, setInputPw] = useState("");
+
+  const navigate = useNavigate();
 
   const [loginStatus, setLoginStatus] = useState("");
 
@@ -20,29 +22,27 @@ function Login() {
   const onClickLogin = () => {
     console.log("click login");
     let body = {
-      id: inputId,
+      email: inputId,
       password: inputPw,
     };
 
-    fetch("http://localhost:3001/login", {
+    fetch("http://172.30.1.17:4000/login", {
       method: "post", // 통신방법
       headers: {
         "content-type": "application/json",
       },
       body: JSON.stringify(body),
-    }).then((res) => {
-      //      if (res.data.message) {
-      //        setLoginStatus(res.data.message);
-      //      } else {
-      //       setLoginStatus(res.data[0].email);
-      //      }
-      // setLoginStatus(res);
-      console.log(res);
-    });
-
-    console.log(loginStatus);
-
-    console.log(body);
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.message) {
+          setLoginStatus(res.message);
+          return alert("아이디 또는 비밀번호가 맞지 않습니다.");
+        } else {
+          setLoginStatus(res[0]["email"]);
+          navigate(`/group/${res[0]["group_type"]}`);
+        }
+      });
   };
 
   const handleSubmit = (e) => {
@@ -96,8 +96,6 @@ function Login() {
           <button type="button">회원가입</button>
         </Link>
       </div>
-
-      <h1>{loginStatus}</h1>
     </div>
   );
 }
