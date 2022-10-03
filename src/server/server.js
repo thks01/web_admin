@@ -3,18 +3,14 @@ const app = express();
 const port = 4000; // react의 기본값은 3000이니까 3000이 아닌 아무 수
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const mysql = require("mysql"); // mysql 모듈 사용
+//const mysql = require("mysql"); // mysql 모듈 사용
 
 const connection = require("./config/db");
-const { connect } = require("./routes/user_inform");
-
-//connection.connect();
+// const { connect } = require("./routes/user_inform");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-// app.use("/", require("./router"));
-// app.use("/login", require("./router"));
 
 app.get("/userinfo", (req, res) => {
   const sql = "SELECT * FROM users";
@@ -108,13 +104,12 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
 
   connection.query(
-    "SELECT u.email, g.group_type FROM bitcoin.users AS u JOIN bitcoin.groups AS g ON u.group_num = g.group_id WHERE u.email=? AND u.password=?",
+    "SELECT u.id, u.email, g.group_type FROM bitcoin.users AS u JOIN bitcoin.groups AS g ON u.group_num = g.group_id WHERE u.email=? AND u.password=?",
     [email, password],
     (err, result) => {
       if (err) {
         res.send({ err: err });
       }
-      console.log(result);
       if (result.length > 0) {
         res.send(result);
       } else {

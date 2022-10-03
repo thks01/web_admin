@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./components/App";
 import Group1Page from "./pages/Group1Page";
@@ -12,13 +13,17 @@ import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 
 function Main() {
+  const [loginStatus, setLoginStatus] = useState(localStorage.getItem("ID"));
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />}>
-          <Route index element={<HomePage />} />
+          <Route index element={<HomePage setLoginStatus={setLoginStatus} />} />
           <Route path="group">
-            <Route path="1" element={<Group1Page />} />
+            <Route
+              path="1"
+              element={<Group1Page loginStatus={loginStatus} />}
+            />
             <Route path="2" element={<Group2Page />} />
             <Route path="3" element={<Group3Page />} />
             <Route path="4" element={<Group4Page />} />

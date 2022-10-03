@@ -1,9 +1,9 @@
 import Login from "../components/Login";
 
-function HomePage() {
+function HomePage({ setLoginStatus }) {
   return (
     <div>
-      <Login />
+      <Login setLoginStatus={setLoginStatus} />
     </div>
   );
 }

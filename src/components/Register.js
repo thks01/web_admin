@@ -57,7 +57,7 @@ function Register() {
 
   const onEmailRedundancyCheck = (event) => {
     event.preventDefault();
-    fetch("http://172.30.1.17:4000/userinfo")
+    fetch("http://localhost:4000/userinfo")
       .then((response) => response.json())
       .then((res) => {
         for (let i = 0; i < res.length; i++) {
@@ -107,20 +107,12 @@ function Register() {
       degree: Degree,
     };
 
-    fetch("http://172.30.1.17:4000/register", {
+    fetch("http://localhost:4000/register", {
       method: "post", // 통신방법
       headers: {
         "content-type": "application/json",
       },
       body: JSON.stringify(body),
-    }).then((res) => {
-      setEmail(body.email);
-      setName(body.name);
-      setPassword(body.password);
-      setAge(body.age);
-      setGender(body.gender);
-      setEduBackground(body.eduBackground);
-      setDegree(body.degree);
     });
 
     console.log(body);
