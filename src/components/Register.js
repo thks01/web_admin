@@ -12,10 +12,10 @@ function Register() {
   const [Password, setPassword] = useState("");
   const [Name, setName] = useState("");
   const [ConfirmPassword, setConfirmPassword] = useState("");
-  const [Age, setAge] = useState("");
-  const [Gender, setGender] = useState("male");
-  const [EduBackground, setEduBackground] = useState("");
-  const [Degree, setDegree] = useState("");
+  //const [Age, setAge] = useState("");
+  //const [Gender, setGender] = useState("male");
+  //const [EduBackground, setEduBackground] = useState("");
+  //const [Degree, setDegree] = useState("");
   const [isChecked, setIschecked] = useState(false);
   const [isRedundancy, setisRedundancy] = useState(false);
 
@@ -39,21 +39,21 @@ function Register() {
     setConfirmPassword(event.currentTarget.value);
   };
 
-  const onAgeHandler = (event) => {
-    setAge(event.currentTarget.value);
-  };
+  // const onAgeHandler = (event) => {
+  //   setAge(event.currentTarget.value);
+  // };
 
-  const onGenderHandler = (event) => {
-    setGender(event.currentTarget.value);
-  };
+  // const onGenderHandler = (event) => {
+  //   setGender(event.currentTarget.value);
+  // };
 
-  const onEduBackgroundHandler = (event) => {
-    setEduBackground(event.currentTarget.value);
-  };
+  // const onEduBackgroundHandler = (event) => {
+  //   setEduBackground(event.currentTarget.value);
+  // };
 
-  const onDegreeHandler = (event) => {
-    setDegree(event.currentTarget.value);
-  };
+  // const onDegreeHandler = (event) => {
+  //   setDegree(event.currentTarget.value);
+  // };
 
   const onEmailRedundancyCheck = (event) => {
     event.preventDefault();
@@ -89,22 +89,23 @@ function Register() {
       return alert("비밀번호를 입력해주세요.");
     } else if (Password !== ConfirmPassword) {
       return alert("비밀번호 확인이 일치하지 않습니다.");
-    } else if (Age === "") {
-      return alert("나이를 입력해주세요.");
-    } else if (EduBackground === "") {
-      return alert("교육 배경을 입력해주세요.");
-    } else if (Degree === "") {
-      return alert("최종 학력을 입력해주세요.");
     }
+    // } else if (Age === "") {
+    //   return alert("나이를 입력해주세요.");
+    // } else if (EduBackground === "") {
+    //   return alert("교육 배경을 입력해주세요.");
+    // } else if (Degree === "") {
+    //   return alert("최종 학력을 입력해주세요.");
+    // }
 
     let body = {
       email: Email,
       name: Name,
       password: Password,
-      age: Age,
-      gender: Gender,
-      eduBackground: EduBackground,
-      degree: Degree,
+      // age: Age,
+      // gender: Gender,
+      // eduBackground: EduBackground,
+      // degree: Degree,
     };
 
     fetch("http://localhost:4000/register", {
@@ -142,7 +143,7 @@ function Register() {
         value={ConfirmPassword}
         onChange={onConfirmPasswordHandler}
       />
-      <label>나이</label>
+      {/* <label>나이</label>
       <input
         type="number"
         value={Age}
@@ -163,7 +164,7 @@ function Register() {
         onChange={onEduBackgroundHandler}
       />
       <label>최종 학력</label>
-      <input type="text" value={Degree} onChange={onDegreeHandler} />
+      <input type="text" value={Degree} onChange={onDegreeHandler} /> */}
       <button type="submit">회원 가입</button>
     </form>
   );

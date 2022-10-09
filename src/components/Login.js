@@ -34,7 +34,7 @@ function Login({ setLoginStatus }) {
       .then((res) => {
         if (res.message) {
           localStorage.setItem("ID", "");
-          return alert("아이디 또는 비밀번호가 맞지 않습니다.");
+          return alert("이메일 또는 비밀번호가 맞지 않습니다.");
         } else {
           localStorage.setItem("ID", res[0]["id"]);
           return res[0]["group_type"];
@@ -70,7 +70,7 @@ function Login({ setLoginStatus }) {
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="input_id">ID : </label>
+          <label htmlFor="input_id">Email : </label>
           <input
             type="text"
             name="input_id"
@@ -79,7 +79,7 @@ function Login({ setLoginStatus }) {
           />
         </div>
         <div>
-          <label htmlFor="input_pw">PW : </label>
+          <label htmlFor="input_pw">PassWord : </label>
           <input
             type="password"
             name="input_pw"
@@ -89,13 +89,13 @@ function Login({ setLoginStatus }) {
         </div>
         <div>
           <button type="button" onClick={onClickLogin}>
-            로그인
+            login
           </button>
         </div>
       </form>
       <div>
         <Link to="/register">
-          <button type="button">회원가입</button>
+          <button type="button">register</button>
         </Link>
       </div>
     </div>
