@@ -37,12 +37,13 @@ function Login({ setLoginStatus }) {
           return alert("이메일 또는 비밀번호가 맞지 않습니다.");
         } else {
           localStorage.setItem("ID", res[0]["id"]);
+          localStorage.setItem("group_type", res[0]["group_type"]);
           return res[0]["group_type"];
         }
       })
       .then((id) => {
         if (id) {
-          navigate(`/group/${id}`);
+          navigate(`/survey`);
         }
       });
   };
@@ -94,6 +95,12 @@ function Login({ setLoginStatus }) {
         </div>
       </form>
       <div>
+        <Link to="/findemail">
+          <button type="button">find email</button>
+        </Link>
+        <Link to="/findpassword">
+          <button type="button">find password</button>
+        </Link>
         <Link to="/register">
           <button type="button">register</button>
         </Link>

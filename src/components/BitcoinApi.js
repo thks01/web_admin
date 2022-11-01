@@ -10,12 +10,16 @@ function BitcoinApi() {
 
   // 데이터 담을 곳
   const [coins, setCoins] = useState([]);
+  const [krw, setKrw] = useState();
 
   useEffect(() => {
     fetch("https://api.coinpaprika.com/v1/tickers?quotes=KRW")
       .then((response) => response.json())
       .then((json) => {
-        setCoins(json.items.slice(0, 100)); // 가져온 데이터 1~100위 담기
+        console.log(json[0]);
+        //setCoins(json[0]);
+        //setKrw(json[0]["quotes"]["KRW"]);
+        setCoins(json.slice(0, 1)); // 가져온 데이터 1~100위 담기
         setLoading(false); // 로딩 멈추기
       });
   }, []);
@@ -24,13 +28,13 @@ function BitcoinApi() {
     <div className="App">
       <section className="coin-tracker">
         <div className="title flex-grid flex-grid--center">
-          <h1>암호화폐 실시간 TOP 100</h1>
+          <h1>비트코인 실시간 시세</h1>
           <div className="btn">
             <button onClick={refreshPage}>새로고침</button>
           </div>
         </div>
         <div className="result">
-          {loading ? <span className="loader">Loading...</span> : coins}
+          {loading ? <span className="loader">Loading...</span> : ""}
           <table>
             <thead>
               <tr>
@@ -45,6 +49,24 @@ function BitcoinApi() {
               </tr>
             </thead>
             <tbody>
+              {/* <tr>
+                <td>{coins.rank}</td>
+                <td>{coins.name}</td>
+                <td>{coins.symbol}</td>
+                <td>{krw.price}</td>
+                <td>{Number(coins.quotes.KRW.price)}</td>
+                <td>
+                  {Number(coins.quotes.KRW.price.toFixed(1)).toLocaleString()}
+                </td>
+                <td>
+                  {(coins.quotes.KRW.market_cap / 1000000000000).toFixed(2)}T
+                </td>
+                <td>
+                  {(coins.quotes.KRW.volume_24h / 1000000000000).toFixed(2)}T
+                </td>
+                <td>{coins.quotes.KRW.percent_change_24h.toFixed(2)}%</td>
+                <td>{coins.quotes.KRW.percent_change_7d.toFixed(2)}%</td>
+              </tr> */}
               {coins.map((coin, idx) => (
                 <tr key={idx}>
                   <td>{coin.rank}</td>

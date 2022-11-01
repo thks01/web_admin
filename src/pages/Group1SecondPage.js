@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import BitCoin from "../components/bitcoin-chart/src/BitCoin";
 import BitcoinApi from "../components/BitcoinApi";
 import CoinAndCash from "../components/CoinAndCash";
-import MembersDecision from "../components/MembersDecision";
-import RemainingTimeAndInitialPrice from "../components/RemainingTimeAndInitialPrice";
+import RemainingTimeAndFinalPrice from "../components/RemainingTimeAndFinalPrice";
+import Suggestion from "../components/Suggestion";
 
-function Group1Page({ loginStatus }) {
+function Group1SecondPage({ loginStatus }) {
   const navigate = useNavigate();
 
   const onClickLogout = (e) => {
@@ -15,7 +15,7 @@ function Group1Page({ loginStatus }) {
   };
 
   const onNextPage = (e) => {
-    navigate("second");
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -37,13 +37,13 @@ function Group1Page({ loginStatus }) {
           로그아웃
         </button>
         <CoinAndCash />
-        <MembersDecision />
+        <Suggestion />
         <BitcoinApi />
         <BitCoin />
-        <RemainingTimeAndInitialPrice t={180} onNextPage={onNextPage} />
+        <RemainingTimeAndFinalPrice onNextPage={onNextPage} />
       </div>
     );
   }
 }
 
-export default Group1Page;
+export default Group1SecondPage;

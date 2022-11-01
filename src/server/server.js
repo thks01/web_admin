@@ -61,13 +61,13 @@ app.post("/register", (req, res) => {
       const groupNum = parseInt(result[0]["COUNT(*)"] / 4) + 1;
 
       connection.query(
-        "INSERT INTO users (id, age, gender, eduBackground, degree, email, password, group_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO users (id, email, password, group_num) VALUES (?, ?, ?, ?)",
         [
           id,
-          body.age,
-          body.gender,
-          body.eduBackground,
-          body.degree,
+          // body.age,
+          // body.gender,
+          // body.eduBackground,
+          // body.degree,
           body.email,
           body.password,
           groupNum,
@@ -114,6 +114,223 @@ app.post("/login", (req, res) => {
         res.send(result);
       } else {
         res.status(404).send({ message: "실패" });
+      }
+    }
+  );
+});
+
+app.post("/survey", (req, res) => {
+  const body = req.body;
+  connection.query(
+    "UPDATE bitcoin.users SET age = ?, gender = ?, eduBackground = ?, degree = ? WHERE id = ?",
+    [body.age, body.gender, body.eduBackground, body.degree, body.id]
+  );
+});
+
+app.post("/findpassword", (req, res) => {
+  const body = req.body;
+  connection.query(
+    "SELECT password from bitcoin.users WHERE email = ?",
+    [body.email],
+    (err, result) => {
+      if (err) {
+        res.send({ err: err });
+      }
+      if (result.length > 0) {
+        res.send(result);
+      } else {
+        res.status(404).send({ message: "실패" });
+      }
+    }
+  );
+});
+
+app.post("/coinandcash", (req, res) => {
+  const body = req.body;
+  connection.query(
+    "SELECT group_num from bitcoin.users WHERE id = ?",
+    [body.id],
+    (err, result) => {
+      if (err) {
+        res.send({ err: err });
+      } else {
+        connection.query(
+          "SELECT num_of_coins, amount_of_cash from bitcoin.groups WHERE group_id = ?",
+          [result[0]["group_num"]],
+          (err, result) => {
+            if (err) {
+              res.send({ err: err });
+            } else {
+              res.send(result);
+            }
+          }
+        );
+      }
+    }
+  );
+});
+
+app.post("/membersdecision", (req, res) => {
+  const body = req.body;
+  let col_name = `init_price_${body.test_num}`;
+  connection.query(
+    "SELECT group_num from bitcoin.users WHERE id = ?",
+    [body.id],
+    (err, result) => {
+      if (err) {
+        res.send({ err: err });
+      } else {
+        connection.query(
+          `SELECT user_id, ${col_name} from bitcoin.prediction WHERE group_id = ?`,
+          [result[0]["group_num"]],
+          (err, result) => {
+            if (err) {
+              res.send({ err: err });
+            } else {
+              res.send(result);
+            }
+          }
+        );
+      }
+    }
+  );
+});
+
+app.post("/initialPrice", (req, res) => {
+  const body = req.body;
+  let init_price_name = `init_price_${body.test_num}`;
+  let init_dec_time_name = `init_dec_time_${body.test_num}`;
+  let init_group_mean_name = `init_group_mean_${body.test_num}`;
+  connection.query(
+    `UPDATE bitcoin.prediction SET ${init_price_name} = ?, ${init_dec_time_name} = ? WHERE user_id = ?`,
+    [body.initialPrice, body.predTime, body.id],
+    (err, result) => {
+      if (result) {
+        connection.query(
+          "SELECT group_num FROM bitcoin.users WHERE id = ?",
+          [body.id],
+          (err, result) => {
+            if (result) {
+              let groupNum = result[0]["group_num"];
+              connection.query(
+                `SELECT ${init_price_name} FROM bitcoin.prediction WHERE group_id = ?`,
+                [groupNum],
+                (err, result) => {
+                  if (result) {
+                    let mean_of_group = 0;
+                    let total = result.length;
+                    for (let i = 0; i < result.length; i++) {
+                      if (result[i][init_price_name] != 0) {
+                        mean_of_group += result[i][init_price_name];
+                      } else {
+                        total -= 1;
+                      }
+                    }
+                    mean_of_group /= total;
+                    connection.query(
+                      `UPDATE bitcoin.groups SET ${init_group_mean_name} = ? WHERE group_id = ?`,
+                      [mean_of_group, groupNum],
+                      (err, result) => {
+                        if (err) {
+                          res.send({ err: err });
+                        } else {
+                          res.send({ result: result });
+                        }
+                      }
+                    );
+                  } else {
+                    console.log(err);
+                  }
+                }
+              );
+            } else {
+              console.log(err);
+            }
+          }
+        );
+      }
+    }
+  );
+});
+
+app.post("/whetherToChange", (req, res) => {
+  const body = req.body;
+  let whether_to_change_name = `whether_to_change_${body.test_num}`;
+  let second_dec_time_name = `second_dec_time_${body.test_num}`;
+
+  if (body.whetherToChange == "YES") {
+    let binaryValue = 1;
+  } else {
+    let binaryValue = 0;
+  }
+
+  connection.query(
+    `UPDATE bitcoin.prediction SET ${whether_to_change_name} = ?, ${second_dec_time_name} = ? WHERE user_id = ?`,
+    [binaryValue, body.predTime, body.id],
+    (err, result) => {
+      if (result) {
+        console.log(result);
+      } else {
+        console.log(err);
+      }
+    }
+  );
+});
+
+app.post("/finalPrice", (req, res) => {
+  const body = req.body;
+
+  let final_price_name = `final_price_${body.test_num}`;
+  let final_dec_time_name = `final_dec_time_${body.test_num}`;
+  let final_group_mean_name = `final_group_mean_${body.test_num}`;
+
+  connection.query(
+    `UPDATE bitcoin.prediction SET ${final_price_name} = ?, ${final_dec_time_name} = ? WHERE user_id = ?`,
+    [body.finalPrice, body.predTime, body.id],
+    (err, result) => {
+      if (result) {
+        connection.query(
+          "SELECT group_num FROM bitcoin.users WHERE id = ?",
+          [body.id],
+          (err, result) => {
+            if (result) {
+              let groupNum = result[0]["group_num"];
+              connection.query(
+                `SELECT ${final_price_name} FROM bitcoin.prediction WHERE group_id = ?`,
+                [groupNum],
+                (err, result) => {
+                  if (result) {
+                    let mean_of_group = 0;
+                    let total = result.length;
+                    for (let i = 0; i < result.length; i++) {
+                      if (result[i][final_price_name] != 0) {
+                        mean_of_group += result[i][final_price_name];
+                      } else {
+                        total -= 1;
+                      }
+                    }
+                    mean_of_group /= total;
+                    connection.query(
+                      `UPDATE bitcoin.groups SET ${final_group_mean_name} = ? WHERE group_id = ?`,
+                      [mean_of_group, groupNum],
+                      (err, result) => {
+                        if (err) {
+                          res.send({ err: err });
+                        } else {
+                          res.send({ result: result });
+                        }
+                      }
+                    );
+                  } else {
+                    console.log(err);
+                  }
+                }
+              );
+            } else {
+              console.log(err);
+            }
+          }
+        );
       }
     }
   );
