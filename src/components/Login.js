@@ -23,55 +23,45 @@ function Login({ setLoginStatus }) {
       password: inputPw,
     };
 
-    fetch("http://localhost:4000/login", {
-      method: "post", // 통신방법
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(body),
-    })
+    fetch(
+      //"http://192.168.0.27:4000/adminlogin",
+      "http://localhost:4000/adminlogin",
+      {
+        method: "post", // 통신방법
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    )
       .then((response) => response.json())
       .then((res) => {
+        console.log(res);
         if (res.message) {
           localStorage.setItem("ID", "");
           return alert("이메일 또는 비밀번호가 맞지 않습니다.");
         } else {
           localStorage.setItem("ID", res[0]["id"]);
-          localStorage.setItem("group_type", res[0]["group_type"]);
-          return res[0]["group_type"];
+          return res[0]["id"];
         }
       })
       .then((id) => {
         if (id) {
-          navigate(`/survey`);
+          navigate(`/download`);
         }
       });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // navigate("/");
   };
-
-  // 페이지 렌더링 후 가장 처음 호출되는 함수
-  //  useEffect(
-  //    () => {
-  //      axios
-  //        .get("/user_inform/login")
-  //        .then((res) => console.log(res))
-  //        .catch();
-  //    },
-  // 페이지 호출 후 처음 한번만 호출될 수 있도록 [] 추가
-  //    []
-  //  );
 
   return (
     <div>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="input_id">Email : </label>
+          <label htmlFor="input_id">ID : </label>
           <input
             type="text"
             name="input_id"
@@ -90,20 +80,17 @@ function Login({ setLoginStatus }) {
         </div>
         <div>
           <button type="button" onClick={onClickLogin}>
-            login
+            Login
           </button>
         </div>
       </form>
       <div>
-        <Link to="/findemail">
-          <button type="button">find email</button>
-        </Link>
-        <Link to="/findpassword">
+        {/* <Link to="/findpassword">
           <button type="button">find password</button>
         </Link>
         <Link to="/register">
           <button type="button">register</button>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

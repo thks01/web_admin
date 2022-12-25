@@ -24,13 +24,17 @@ function FindPasswordPage() {
       email: email,
     };
 
-    fetch("http://localhost:4000/findpassword", {
-      method: "post", // 통신방법
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(body),
-    })
+    fetch(
+      //"http://192.168.0.27:4000/findpassword",
+      "http://localhost:4000/findpassword",
+      {
+        method: "post", // 통신방법
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    )
       .then((response) => response.json())
       .then((res) => {
         if (res["message"]) {

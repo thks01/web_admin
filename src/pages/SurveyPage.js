@@ -45,6 +45,8 @@ function SurverPage({ loginStatus }) {
       degree: Degree,
     };
 
+    console.log(body);
+
     fetch("http://localhost:4000/survey", {
       method: "post", // 통신방법
       headers: {
@@ -52,8 +54,6 @@ function SurverPage({ loginStatus }) {
       },
       body: JSON.stringify(body),
     });
-
-    console.log(body);
 
     alert("설문이 완료되었습니다.");
 
